@@ -1,0 +1,21 @@
+# Go binaries
+*.exe
+*.out
+/bin/
+
+# Test output
+*.test
+
+# Coverage
+coverage.out
+coverage.html
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Environment
+.env
