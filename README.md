@@ -23,13 +23,11 @@ Imagine an esports tournament with thousands of matches happening simultaneously
 
 Every second, the system receives events:
 
-```
-Player killed
-Objective captured
-Round started
-Round finished
-Match completed
-```
+- Player killed
+- Objective captured
+- Round started
+- Round finished
+- Match completed
 
 The backend must:
 
@@ -77,31 +75,55 @@ Main learning goals:
 
 Current architecture:
 
-```
-                 HTTP API
+```text
+			HTTP API
 
-                    |
-                    v
+                |
+                v
 
-             Event Processor
+         Event Processor
 
-                    |
-                    v
+                |
+                v
 
-              Match Service
+          Match Service
 
-                    |
-                    v
+                |
+                v
 
-          In-memory Match State
+      In-memory Match State
 
-                    |
-                    v
+                |
+                v
 
-             View Model API
+         View Model API
 ```
 
 The architecture will evolve as new requirements are introduced.
+
+---
+
+# ✅ Current Status
+
+**Implemented:**
+
+- Domain layer: `MatchState`, `MatchEvent`, `Fixture`, `Team`, `Player`
+- Event application logic (`MatchState.Apply`) with versioning/out-of-order rejection
+- In-memory `MatchRepository` adapter (`MemoryMatchAdapter`)
+- In-memory `FixtureRepository` adapter (`MemoryFixtureAdapter`)
+- `EventProcessor` and `FixtureService` application services
+- `ViewBuilder` for read-model projection
+- Unit tests for score update event application and fixture adapter behavior
+
+**Not yet implemented:**
+
+- HTTP API (Level 1) — `cmd/api/main.go` is a placeholder
+- Concurrency safety across multi-step operations (see known issue below)
+- Worker pools, graceful shutdown, observability (Levels 4–6)
+
+**Known issue:**
+
+- `EventProcessor.Process` performs Get → Apply → Save as separate steps. Each step is individually thread-safe, but the sequence as a whole is not — concurrent events for the same fixture can race. This is the Level 3 concurrency problem the roadmap below calls out.
 
 ---
 
@@ -140,11 +162,9 @@ Process live match events.
 
 Example:
 
-```
-Team A scored
-Team B scored
-Round ended
-```
+- Team A scored
+- Team B scored
+- Round ended
 
 Concepts:
 
@@ -215,7 +235,7 @@ Important design choices are documented using ADRs.
 
 Examples:
 
-```
+```text
 docs/adr/
 
 ADR-0001-use-in-memory-state.md
@@ -237,8 +257,8 @@ The project includes:
 
 Concurrency checks:
 
-```
-go test -race ./...
+```bash
+go test --race ./...
 ```
 
 ---
