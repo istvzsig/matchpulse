@@ -7,4 +7,5 @@ var (
 	ErrOutdatedEvent = errors.New("outdated event")
 	ErrMatchFinished = errors.New("match already finished")
 	ErrInvalidWinner = errors.New("winner can only be assigned to finished match")
+	ErrMatchNotFound = errors.New("match not found")
 )
