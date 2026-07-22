@@ -16,6 +16,7 @@ type MatchEvent struct {
 	Type      EventType
 	TeamID    string
 	Value     int
+	Status    MatchStatus
 	Winner    string
 	Timestamp time.Time
 	Version   int64

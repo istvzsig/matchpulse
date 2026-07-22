@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"strconv"
 	"time"
 )
 
@@ -49,7 +48,7 @@ func (m *MatchState) Apply(event MatchEvent) error {
 		m.Scores[event.TeamID] += event.Value
 
 	case EventStatusChange:
-		m.Status = MatchStatus(strconv.Itoa(event.Value))
+		m.Status = event.Status
 
 	case EventWinnerUpdate:
 		if m.Status != StatusFinished {

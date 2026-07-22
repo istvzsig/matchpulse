@@ -33,3 +33,30 @@ func TestMatchStateApplyScoreUpdate(t *testing.T) {
 	}
 
 }
+
+func TestMatchStateApplyStatusChange(t *testing.T) {
+
+	state := NewMatchState("F123")
+
+	event := MatchEvent{
+		ID:        "E1",
+		FixtureID: "F123",
+		Type:      EventStatusChange,
+		Status:    StatusLive,
+		Version:   1,
+		Timestamp: time.Now(),
+	}
+
+	err := state.Apply(event)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if state.Status != StatusLive {
+		t.Fatalf(
+			"expected status %s got %s",
+			StatusLive, state.Status,
+		)
+	}
+}
