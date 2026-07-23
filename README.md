@@ -121,10 +121,6 @@ The architecture will evolve as new requirements are introduced.
 - Concurrency safety across multi-step operations (see known issue below)
 - Worker pools, graceful shutdown, observability (Levels 4–6)
 
-**Known issue:**
-
-- `EventProcessor.Process` performs Get → Apply → Save as separate steps. Each step is individually thread-safe, but the sequence as a whole is not — concurrent events for the same fixture can race. This is the Level 3 concurrency problem the roadmap below calls out.
-
 ---
 
 # 🚀 Development Roadmap
@@ -133,7 +129,7 @@ The project grows incrementally.
 
 Each stage introduces a real engineering problem.
 
-## Level 1 - Match Server
+## ✅ Level 1 - Match Server
 
 Goal:
 
@@ -154,7 +150,7 @@ Concepts:
 
 ---
 
-## Level 2 - Event Processing
+## ✅ Level 2 - Event Processing
 
 Goal:
 
@@ -174,7 +170,7 @@ Concepts:
 
 ---
 
-## Level 3 - Concurrency
+## ✅ Level 3 - Concurrency
 
 Problem:
 
