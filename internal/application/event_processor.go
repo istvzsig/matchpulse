@@ -22,28 +22,21 @@ func NewEventProcessor(
 	}
 }
 
+// Process applies a single event to the fixture's match state.
+// Uses Update rather than separate Get/Save calls so the whole
+// read-apply-write sequence is atomic per fixture, even under
+// concurrent event submission.
 func (processor *EventProcessor) Process(
 	ctx context.Context,
 	event domain.MatchEvent,
 ) error {
 
-	state, err := processor.repository.Get(
+	return processor.repository.Update(
 		ctx,
 		event.FixtureID,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	err = state.Apply(event)
-
-	if err != nil {
-		return err
-	}
-
-	return processor.repository.Save(
-		ctx,
-		state,
+		func(state domain.MatchState) (domain.MatchState, error) {
+			err := state.Apply(event)
+			return state, err
+		},
 	)
 }

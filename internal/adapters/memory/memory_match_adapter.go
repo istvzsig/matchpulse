@@ -65,3 +65,40 @@ func (m *MemoryMatchAdapter) Save(
 
 	return nil
 }
+
+// Update performs an atomic read-modify-write for a single fixture.
+// The whole operation - read, mutate, write - happens under one write
+// lock, so two concurrent Update calls for the same fixture can never
+// interleave and silently lose one of their changes.
+//
+// Note: this holds the adapter's single global lock for the duration of
+// the mutation, which means Update for fixture A briefly blocks Get/Save/
+// Update for fixture B too. That's the simplest correct option for an
+// in-memory map; if match volume grows large enough for that to matter,
+// the next step would be per-fixture locks (e.g. a map[string]*sync.Mutex)
+// instead of one lock for the whole adapter.
+func (m *MemoryMatchAdapter) Update(
+	ctx context.Context,
+	fixtureID string,
+	mutate func(state domain.MatchState) (domain.MatchState, error),
+) error {
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	state, ok := m.matches[fixtureID]
+
+	if !ok {
+		return domain.ErrMatchNotFound
+	}
+
+	newState, err := mutate(state)
+
+	if err != nil {
+		return err
+	}
+
+	m.matches[fixtureID] = newState
+
+	return nil
+}
